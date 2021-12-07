@@ -12,7 +12,7 @@ export default function useFetch(url) {
       try {
         const response = await fetch(baseUrl + url);
         if (response.ok) {
-          const json = await response.json("products?category=shoes");
+          const json = await response.json();
           setData(json);
         } else {
           throw response;
