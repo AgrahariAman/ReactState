@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import Footer from "./Footer";
 import Header from "./Header";
@@ -7,11 +7,20 @@ import Products from "./Products";
 // import Spinner from "./Spinner";
 // import useFetch from "./services/useFetch";
 import { Route, Routes } from "react-router";
-import Detail from "./Detail";
+import Detail from "./DetailRefs";
 import Cart from "./Cart";
-
+import Checkout from "./Checkout";
 export default function App() {
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("cart")) ?? [];
+    } catch {
+      console.error("The cart Could not be parsed  into JSON");
+      return [];
+    }
+  });
+
+  useEffect(() => localStorage.setItem("cart", JSON.stringify(cart)), [cart]);
 
   function addToCart(id, sku) {
     setCart((items) => {
@@ -36,7 +45,9 @@ export default function App() {
       return item.map((i) => (i.sku === sku ? { ...i, quantity } : i));
     });
   }
-
+  function emptyCart() {
+    setCart([]);
+  }
   return (
     <>
       <div className="content">
@@ -52,6 +63,10 @@ export default function App() {
             <Route
               path="/cart"
               element={<Cart cart={cart} updateQuantity={updateQuantity} />}
+            />
+            <Route
+              path="/checkout"
+              element={<Checkout cart={cart} emptyCart={emptyCart} />}
             />
           </Routes>
         </main>
